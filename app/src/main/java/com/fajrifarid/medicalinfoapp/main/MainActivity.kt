@@ -17,5 +17,16 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        // Mengecek apakah activity ini baru pertama kali dibuat (bukan hasil rotasi/saved state)
+        if (savedInstanceState == null) {
+            // Menampilkan fragment utama (MainFragment) ke dalam container yang ada di layout
+            supportFragmentManager.beginTransaction()
+                .replace(
+                    R.id.fragment_container, // ID container (FrameLayout) tempat fragment akan dimasukkan
+                    MainFragment.newInstance("", "") // Memanggil fragment utama, dengan parameter kosong
+                )
+                .commitNow() // Segera jalankan transaksinya
+        }
     }
 }
