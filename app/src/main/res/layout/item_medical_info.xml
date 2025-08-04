@@ -1,38 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="16dp">
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/tv_hospital_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="16dp"
             android:textSize="18sp"
             android:textStyle="bold"
-            tools:text="Hospital"
-            />
+            android:textColor="#222222"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_options"
+            app:layout_constraintBottom_toTopOf="@id/iv_address_icon"
+            tools:text="RS Sehat Sentosa" />
 
-        <!-- Address with icon -->
+        <ImageView
+            android:id="@+id/btn_options"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="0dp"
+            android:contentDescription="More options"
+            android:src="@drawable/ic_more_menu"
+            app:layout_constraintTop_toTopOf="@id/tv_hospital_name"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <ImageView
             android:id="@+id/iv_address_icon"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginTop="12dp"
             android:contentDescription="Location icon"
-            android:layout_margin="16dp"
             android:src="@drawable/ic_location"
             app:layout_constraintTop_toBottomOf="@id/tv_hospital_name"
             app:layout_constraintStart_toStartOf="parent" />
@@ -47,16 +57,13 @@
             app:layout_constraintStart_toEndOf="@id/iv_address_icon"
             app:layout_constraintTop_toTopOf="@id/iv_address_icon"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="Jl. Merdeka No. 1, Jakarta" />
+            tools:text="Jl. Pahlawan No. 9, Makassar" />
 
-        <!-- Phone with icon -->
         <ImageView
             android:id="@+id/iv_phone_icon"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginTop="8dp"
-            android:layout_margin="16dp"
-
             android:contentDescription="Phone icon"
             android:src="@drawable/ic_phone"
             app:layout_constraintTop_toBottomOf="@id/iv_address_icon"
@@ -67,7 +74,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="8dp"
             android:textSize="14sp"
             android:textColor="#555555"
             app:layout_constraintStart_toEndOf="@id/iv_phone_icon"

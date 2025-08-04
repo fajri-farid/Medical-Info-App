@@ -82,4 +82,14 @@ class MainFragment : Fragment(), MedicalInfoListener {
         intent.data = Uri.parse("tel:$phoneNumber")
         startActivity(intent)
     }
+
+    override fun onEditClicked(item: MedicalInfo) {
+        val bundle = bundleOf("EditMedicalInfo" to item)
+        findNavController().navigate(R.id.action_mainFragment_to_inputFragment, bundle)
+    }
+
+    override fun onDeleteClicked(item: MedicalInfo) {
+        dataManager.removeMedicalInfo(item)
+        loadDataFromStorage()
+    }
 }

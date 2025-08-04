@@ -12,6 +12,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
 import com.fajrifarid.medicalinfoapp.R
 import com.fajrifarid.medicalinfoapp.common.MedicalInfo
+import com.fajrifarid.medicalinfoapp.utils.DataManager
 
 class InputFragment : Fragment() {
     private val btnBack by lazy {view?.findViewById<ImageView>(R.id.iv_back_arrow)}
@@ -20,6 +21,9 @@ class InputFragment : Fragment() {
     private val inputPhoneNumberField by lazy { view?.findViewById<TextView>(R.id.input_hospital_phone_number) }
     private val btnSave by lazy { view?.findViewById<TextView>(R.id.btn_save) }
     private val btnDiscard by lazy { view?.findViewById<TextView>(R.id.btn_discard) }
+
+    private var isEditing = false
+    private var oldMedicalInfo: MedicalInfo? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,6 +50,16 @@ class InputFragment : Fragment() {
         btnBack?.setOnClickListener {
             findNavController().navigateUp()
         }
+
+        arguments?.getParcelable<MedicalInfo>("EditMedicalInfo")?.let { item ->
+            isEditing = true
+            oldMedicalInfo = item
+
+            // Set isi field-nya
+            inputNameField?.setText(item.name)
+            inputAddressField?.setText(item.address)
+            inputPhoneNumberField?.setText(item.phoneNumber)
+        }
     }
 
     private fun discardData(){
@@ -69,12 +83,21 @@ class InputFragment : Fragment() {
             address = inputAddressField?.text.toString(),
             phoneNumber = inputPhoneNumberField?.text.toString()
         )
-        try{
-            findNavController().previousBackStackEntry?.savedStateHandle?.set("NewMedicalInfo", newDataEntry)
+
+        try {
+            if (isEditing && oldMedicalInfo != null) {
+                // mode edit
+                val dataManager = DataManager(requireContext())
+                dataManager.updateMedicalInfo(oldMedicalInfo!!, newDataEntry)
+            } else {
+                // mode tambah
+                findNavController().previousBackStackEntry?.savedStateHandle?.set("NewMedicalInfo", newDataEntry)
+            }
+
             discardData()
-            showToastMessage("Data berhasil ditambahkan")
+            showToastMessage("Data berhasil disimpan")
             findNavController().navigateUp()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             showToastMessage("Terjadi kesalahan")
         }
     }
