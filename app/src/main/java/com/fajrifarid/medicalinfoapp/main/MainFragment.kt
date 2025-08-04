@@ -58,7 +58,6 @@ class MainFragment : Fragment(), MedicalInfoListener {
     private fun initMedicalInfoList(){
         rvMedicalInfo?.layoutManager = LinearLayoutManager(context)
         rvMedicalInfo?.adapter = adapter
-        // adapter.setData(generateDummyData())
 
         loadDataFromStorage()
     }
