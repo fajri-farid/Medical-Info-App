@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fajrifarid.medicalinfoapp.R
 import com.fajrifarid.medicalinfoapp.common.MedicalInfo
 
-class MedicalInfoAdapter: ListAdapter<MedicalInfo, MedicalInfoAdapter.MedicalInfoViewHolder>(DiffUtilCallback()) {
+class MedicalInfoAdapter(val listener: MedicalInfoListener): ListAdapter<MedicalInfo, MedicalInfoAdapter.MedicalInfoViewHolder>(DiffUtilCallback()) {
     inner class MedicalInfoViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(item: MedicalInfo){
             val hospitalNameView = itemView.findViewById<TextView>(R.id.tv_hospital_name)
@@ -19,6 +19,10 @@ class MedicalInfoAdapter: ListAdapter<MedicalInfo, MedicalInfoAdapter.MedicalInf
             hospitalNameView.text = item.name
             hospitalAddressView.text = item.address
             phoneNumberView.text = item.phoneNumber
+
+            phoneNumberView.setOnClickListener {
+                listener.onPhoneNumberClicked(phoneNumberView.text.toString())
+            }
         }
     }
 

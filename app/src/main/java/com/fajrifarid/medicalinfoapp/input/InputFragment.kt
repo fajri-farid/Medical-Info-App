@@ -5,56 +5,100 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.navigation.fragment.findNavController
 import com.fajrifarid.medicalinfoapp.R
+import com.fajrifarid.medicalinfoapp.common.MedicalInfo
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [InputFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class InputFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private val btnBack by lazy {view?.findViewById<ImageView>(R.id.iv_back_arrow)}
+    private val inputNameField by lazy { view?.findViewById<TextView>(R.id.input_hospital_name) }
+    private val inputAddressField by lazy { view?.findViewById<TextView>(R.id.input_hospital_address) }
+    private val inputPhoneNumberField by lazy { view?.findViewById<TextView>(R.id.input_hospital_phone_number) }
+    private val btnSave by lazy { view?.findViewById<TextView>(R.id.btn_save) }
+    private val btnDiscard by lazy { view?.findViewById<TextView>(R.id.btn_discard) }
+    private val medicalInfoData = mutableListOf<MedicalInfo>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+        medicalInfoData.addAll(
+            arguments?.getParcelableArray("medicalInputData")?.toMutableList() as  MutableList<MedicalInfo>
+        )
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_input, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment InputFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            InputFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        btnDiscard?.setOnClickListener {
+                discardData()
+        }
+
+        btnSave?.setOnClickListener {
+           if(isEntryValid()) {
+               saveData()
+           } else {
+               showToastMessage("Data tidak boleh kosong, harap lengkapi")
+           }
+        }
+        handleOnBackPressed()
+
+        btnBack?.setOnClickListener {
+            backToMainFragment()
+        }
+    }
+
+    private fun discardData(){
+        inputNameField?.setText("")
+        inputAddressField?.setText("")
+        inputPhoneNumberField?.setText("")
+    }
+
+    private fun handleOnBackPressed() {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                backToMainFragment()
             }
+        }
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, callback)
+    }
+
+    private fun saveData(){
+        val newDataEntry = MedicalInfo(
+            name = inputNameField?.text.toString(),
+            address = inputAddressField?.text.toString(),
+            phoneNumber = inputPhoneNumberField?.text.toString()
+        )
+        try{
+            medicalInfoData.add(newDataEntry)
+            discardData()
+            showToastMessage("Data berhasil ditambahkan")
+        } catch (e: Exception){
+            showToastMessage("Terjadi kesalahan")
+        }
+    }
+
+    private fun isEntryValid(): Boolean {
+        return !(inputNameField?.text.toString().isBlank() ||
+                inputAddressField?.text.toString().isBlank() ||
+                inputPhoneNumberField?.text.toString().isBlank())
+    }
+
+    private fun backToMainFragment(){
+        val resultData = medicalInfoData
+        findNavController().previousBackStackEntry?.savedStateHandle?.set("ResultKey", resultData)
+        findNavController().navigateUp()
+    }
+
+    private fun showToastMessage(message: String){
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
 }
