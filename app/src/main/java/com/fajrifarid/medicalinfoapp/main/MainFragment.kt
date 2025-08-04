@@ -13,12 +13,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fajrifarid.medicalinfoapp.R
 import com.fajrifarid.medicalinfoapp.common.MedicalInfo
+import com.fajrifarid.medicalinfoapp.utils.DataManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainFragment : Fragment(), MedicalInfoListener {
     private lateinit var rvMedicalInfo : RecyclerView
     private lateinit var fabAddData : FloatingActionButton
     private lateinit var adapter : MedicalInfoAdapter
+
+    private lateinit var dataManager: DataManager
+    private var medicalInfoList = mutableListOf<MedicalInfo>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,13 +33,18 @@ class MainFragment : Fragment(), MedicalInfoListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dataManager = DataManager(requireContext())
         initViews()
         initMedicalInfoList()
         getDataFromInputFragment()
         fabAddData.setOnClickListener {
-            val bundle = bundleOf("medicalInputData" to adapter.currentList.toTypedArray())
-            findNavController().navigate(R.id.action_mainFragment_to_inputFragment, bundle)
+            findNavController().navigate(R.id.action_mainFragment_to_inputFragment)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadDataFromStorage()
     }
 
     private fun initViews(){
@@ -49,27 +58,38 @@ class MainFragment : Fragment(), MedicalInfoListener {
     private fun initMedicalInfoList(){
         rvMedicalInfo?.layoutManager = LinearLayoutManager(context)
         rvMedicalInfo?.adapter = adapter
-        adapter.setData(generateDummyData())
+
+        loadDataFromStorage()
+    }
+
+    private fun loadDataFromStorage() {
+        medicalInfoList = dataManager.getMedicalInfoList()
+        adapter.setData(medicalInfoList)
     }
 
     private fun getDataFromInputFragment(){
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<List<MedicalInfo>>("ResultKey")
-            ?.observe(viewLifecycleOwner) { result ->
-                adapter.setData(result)
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<MedicalInfo>("NewMedicalInfo")
+            ?.observe(viewLifecycleOwner) { newData ->
+                dataManager.addMedicalInfo(newData)
+                loadDataFromStorage()
+
+                findNavController().currentBackStackEntry?.savedStateHandle?.remove<MedicalInfo>("NewMedicalInfo")
             }
-    }
-
-    private fun generateDummyData(): List<MedicalInfo>{
-        return listOf(
-            MedicalInfo(name = "Hospital 1"),
-            MedicalInfo(name = "Hospital 2"),
-        )
-
     }
 
     override fun onPhoneNumberClicked(phoneNumber: String) {
         val intent = Intent(Intent.ACTION_DIAL)
         intent.data = Uri.parse("tel:$phoneNumber")
         startActivity(intent)
+    }
+
+    override fun onEditClicked(item: MedicalInfo) {
+        val bundle = bundleOf("EditMedicalInfo" to item)
+        findNavController().navigate(R.id.action_mainFragment_to_inputFragment, bundle)
+    }
+
+    override fun onDeleteClicked(item: MedicalInfo) {
+        dataManager.removeMedicalInfo(item)
+        loadDataFromStorage()
     }
 }
